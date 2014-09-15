@@ -8,6 +8,7 @@
 #include <cstring>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 #define HORIZONTAL 1
 #define VERTICAL 0
@@ -37,8 +38,9 @@ class m_timer {
 			if (!is_tic) {
 				std::cout << "please call `tic` first." << std::endl;
 			} else {
-				std::cout << "Time elapsed:"
+				std::cout << "Time elapsed: "
 					<< ((double)(clock() - tic_time)) / CLOCKS_PER_SEC
+					<< "s" 
 					<< std::endl;
 			}
 			is_tic = false;
@@ -86,43 +88,20 @@ static m_timer timer;
 	Arguments: size --> the sequence's size
 			   start_from --> the number sequence start from, default is 0
 */
-int* ordered_sequence(int size, int start_from = 0) {
-	int *idx = new int[size];
-	for (int i = 0; i < size; i++) idx[i] = i + start_from;
+template <class T>
+T* ordered_sequence(T size, T start_from = 0) {
+	T *idx = new T[size];
+	for (T i = 0; i < size; i++) idx[i] = i + start_from;
 	return idx;
 }
 
 /*
 	Function: Generate a random double matrix
 */
-double* gen_dmat(int rows, int cols, double start, double end) {
-	double *mat = new double[rows*cols];
-	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_double(start, end);
-	}
-	return mat;
-}
-double* gen_dmat(int rows, int cols) {
-	double *mat = new double[rows*cols];
-	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_double();
-	}
-	return mat;
-}
-int* gen_imat(int rows, int cols, int start, int end) {
-	int *mat = new int[rows*cols];
-	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_int(start, end);
-	}
-	return mat;
-}
-int *gen_imat(int rows, int cols) {
-	int *mat = new int[rows*cols];
-	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_int();
-	}
-	return mat;
-}
+double* gen_dmat(int rows, int cols, double start, double end);
+double* gen_dmat(int rows, int cols);
+int* gen_imat(int rows, int cols, int start, int end);
+int *gen_imat(int rows, int cols);
 
 /*
 	Function: print an vector
@@ -164,7 +143,7 @@ template <class T>
 int* argsort(T *arr, int size, int asc = 1) {
 	int st_head = 0, u, v, tmp, *m_stack = new int[size*2], from, to;
 	// get an ordered sequence start from 0
-	int *idx = ordered_sequence(size);
+	int *idx = ordered_sequence<int>(size);
 	
 	// check argument
 	if (asc != 1 && asc != -1) {
@@ -320,34 +299,7 @@ T* mat_min(T *mat, int rows, int cols, bool horizontal = true) {
 			   inplace --> whether normalize in the given matrix or create a new one
 			   horizontal --> normalize the matrix horizontally or vertically (default true)
 */
-double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizontal = true) {
-	double *mat_t, tot;
-	if (inplace) {
-		mat_t = mat;
-	} else {
-		mat_t = new double[rows*cols];
-		memcpy(mat_t, mat, sizeof(double)*rows*cols);
-	}
-	if (horizontal) {
-		for (int i = 0; i < rows; i++) {
-			tot = (double)0;
-			// accumulate horizontally
-			for (int j = 0; j < cols; j++) tot += mat_t[i*cols + j];
-			if (tot > 0)
-				for (int j = 0; j < cols; j++) mat_t[i*cols + j] /= tot;
-		}
-	} else {
-		for (int j = 0; j < cols; j++) {
-			tot = (double)0;
-			// accumulate vertically
-			for (int i = 0; i < rows; i++) tot += mat_t[i*cols + j];
-			if (tot > 0)
-				for (int i = 0; i < rows; i++) mat_t[i*cols + j] /= tot;
-		}
-	}
-
-	return mat_t;
-}
+double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizontal = true);
 
 /*
 	Function: Scale the matrix
@@ -357,58 +309,7 @@ double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizo
 			   start, end --> scale range
 			   horizontal --> scale the matrix horizontally or vertically (default false)
 */
-double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, double end, bool horizontal = false) {
-	double* mat_t, *max_vec, *min_vec;
-	// check arguments
-	if (start > end) {
-		std::cout << "`end` must larger than `start`" << std::endl;
-		return NULL;
-	}
-	
-	if (inplace) {
-		mat_t = mat;
-	} else {
-		mat_t = new double[rows*cols];
-		memcpy(mat_t, mat, sizeof(double)*rows*cols);
-	}
-
-	if (horizontal) {
-		max_vec = mat_max(mat_t, rows, cols, true);
-		min_vec = mat_min(mat_t, rows, cols, true);
-		for (int i = 0; i < rows; i++) {
-			if (max_vec[i] > min_vec[i]) {
-				for (int j = 0; j < cols; j++) {
-					mat_t[i*cols + j] = (mat_t[i*cols + j] - min_vec[i]) / (max_vec[i] - min_vec[i]) * (end - start) + start;
-				}
-			} else {
-				for (int j = 0; j < cols; j++) {
-					// if all elements in a row is same, then we scale it to (start+end)/2
-					mat_t[i*cols + j] = (start + end) / 2;	
-				}
-			}
-		}
-	} else {
-		max_vec = mat_max(mat_t, rows, cols, false);
-		min_vec = mat_min(mat_t, rows, cols, false);
-		for (int j = 0; j < cols; j++) {
-			if (max_vec[j] > min_vec[j]) {
-				for (int i = 0; i < rows; i++) {
-					mat_t[i*cols + j] = (mat_t[i*cols + j] - min_vec[j]) / (max_vec[i] - min_vec[j]) * (end - start) + start;
-				}
-			}
-			else {
-				for (int i = 0; i < rows; i++) {
-					// if all elements in a column is same, then we scale it to (start+end)/2
-					mat_t[i*cols + j] = (start + end) / 2;
-				}
-			}
-		}
-	}
-
-	delete[] max_vec;
-	delete[] min_vec;
-	return mat_t;
-}
+double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, double end, bool horizontal = false);
 
 /*
 	Function: accumulate the matrix
