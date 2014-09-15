@@ -302,6 +302,9 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 		m_stack[st_head++] = to;
 	}
 
+	for (int i = 0; i < active_row_size; i++) {
+		idx[i] = active_row[idx[i]];
+	}
 	delete[] m_stack;
 	return idx;
 }
