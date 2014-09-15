@@ -15,6 +15,8 @@
 #define ALL -1
 #define INPLACE true
 #define NOT_INPLACE false
+#define ASC 1
+#define DESC -1
 
 /*
 	Class: record elapsed time
@@ -89,8 +91,11 @@ static m_timer timer;
 			   start_from --> the number sequence start from, default is 0
 */
 template <class T>
-T* ordered_sequence(T size, T start_from = 0) {
-	T *idx = new T[size];
+T* ordered_sequence(T size, T *idx = NULL, T start_from = 0) {
+	// T *idx = new T[size];
+	if (idx == NULL) {
+		idx = new T[size];
+	}
 	for (T i = 0; i < size; i++) idx[i] = i + start_from;
 	return idx;
 }
@@ -140,7 +145,7 @@ void print_mat(T* mat, int rows, int cols, char* msg = NULL) {
 			   asc --> sort int ascent order (asc=1) or descent order (asc=-1)
 */
 template <class T>
-int* argsort(T *arr, int size, int asc = 1) {
+int* argsort(T *arr, int size, int asc = ASC) {
 	int st_head = 0, u, v, tmp, *m_stack = new int[size*2], from, to;
 	// get an ordered sequence start from 0
 	int *idx = ordered_sequence<int>(size);
@@ -186,15 +191,130 @@ int* argsort(T *arr, int size, int asc = 1) {
 }
 
 /*
+	Function: Sort one column of a matrix and return index in order
+	Arguments: mat --> matrix to be sorted;
+			   rows, cols --> shape of the matrix;
+			   target --> column index to be sorted;
+			   asc --> sort int ascent order (asc=1) or descent order (asc=-1).
+*/
+template <class T>
+int* argsort(T *mat, int rows, int cols, int target, int asc = ASC, int *idx = NULL) {
+	int st_head = 0, u, v, tmp, *m_stack = new int[rows*2], from, to;
+	// get an ordered sequence start from 0
+	if (idx == NULL)
+		idx = ordered_sequence<int>(rows);				// need to allocate space
+	else
+		idx = ordered_sequence<int>(rows, idx);			// do not need to allocate space
+	
+	// check argument
+	if (asc != 1 && asc != -1) {
+		std::cout << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+	}
+
+	// if array size is too small, just return idx
+	if (rows <= 1) return idx;
+
+	// quick sort
+	m_stack[st_head++] = 0;
+	m_stack[st_head++] = rows;
+	while (st_head != 0) {
+		from = m_stack[st_head - 2];
+		to = m_stack[st_head - 1];
+		st_head -= 2;
+
+		if (to - from <= 1) continue;
+		u = from + 1;
+		v = to - 1;
+		while (u <= v) {
+			while (u <= v && asc*mat[idx[u]*cols + target] <= asc*mat[idx[from]*cols + target]) u++;
+			while (u <= v && asc*mat[idx[v]*cols + target] >= asc*mat[idx[from]*cols + target]) v--;
+			if (u <= v) 
+				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+			
+		}
+		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
+		
+		// push left part to stack
+		m_stack[st_head++] = from;
+		m_stack[st_head++] = v;
+		// push right part to stack
+		m_stack[st_head++] = u;
+		m_stack[st_head++] = to;
+	}
+
+	delete[] m_stack;
+	return idx;
+}
+
+/*
+	Function: Sort one column of a part of matrix(specify some rows) and return index in order
+	Arguments: mat --> matrix to be sorted;
+			   rows, cols --> shape of the matrix;
+			   target --> column index to be sorted;
+			   asc --> sort int ascent order (asc=1) or descent order (asc=-1)
+			   idx --> order index array
+			   active_row --> row index to sort
+			   active_row_size --> row size to sort
+*/
+template <class T>
+int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row_size, 
+					int target, int asc = ASC, int *idx = NULL) {
+	int st_head = 0, u, v, tmp, *m_stack = new int[rows*2], from, to;
+	
+	// get an ordered sequence start from 0
+	if (idx == NULL)
+		idx = ordered_sequence<int>(active_row_size);				// need to allocate space
+	else
+		idx = ordered_sequence<int>(active_row_size, idx);			// do not need to allocate space
+	
+	// check argument
+	if (asc != 1 && asc != -1) {
+		std::cout << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+	}
+
+	// if array size is too small, just return idx
+	if (rows <= 1) return idx;
+
+	// quick sort
+	m_stack[st_head++] = 0;
+	m_stack[st_head++] = rows;
+	while (st_head != 0) {
+		from = m_stack[st_head - 2];
+		to = m_stack[st_head - 1];
+		st_head -= 2;
+
+		if (to - from <= 1) continue;
+		u = from + 1;
+		v = to - 1;
+		while (u <= v) {
+			while (u <= v && asc*mat[active_row[idx[u]]*cols + target] <= asc*mat[active_row[idx[from]]*cols + target]) u++;
+			while (u <= v && asc*mat[active_row[idx[v]]*cols + target] >= asc*mat[active_row[idx[from]]*cols + target]) v--;
+			if (u <= v) 
+				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+		}
+		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
+		
+		// push left part to stack
+		m_stack[st_head++] = from;
+		m_stack[st_head++] = v;
+		// push right part to stack
+		m_stack[st_head++] = u;
+		m_stack[st_head++] = to;
+	}
+
+	delete[] m_stack;
+	return idx;
+}
+
+/*
 	Function: Randomly sample m instances from n instances, return m*cols matrix
 	Arguments: mat --> data matrix
 			   rows, cols --> shape of the matrix
 			   m --> size of instances to be sample from matrix
 */
 template <class T>
-T* random_sample(T *mat, int rows, int cols, int m) {
+T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
 	int *idx = ordered_sequence(rows), tmp, instance, u, end;
-	T* ret;
 	if (m > rows) {
 		std::cout << "m must less than the total instances" << std::endl;
 		return NULL;
@@ -216,18 +336,15 @@ T* random_sample(T *mat, int rows, int cols, int m) {
 	end = u + m;
 	// sort the index to return to original order
 	std::sort(idx + u, idx + end);
-	ret = new T[m * cols];
-	// copy corresponding columns to new matrix
+	if(ret == NULL)
+		ret = new T[m * cols];
+	// copy corresponding rows to new matrix
 	for (int i = u; i < end; i++) {
 		memcpy(ret + (i - u) * cols, mat + idx[i] * cols, sizeof(T)*cols);
 	}
 
 	return ret;
 }
-
-
-
-
 
 /*
 	Function: return max vector of a matrix
@@ -300,6 +417,7 @@ T* mat_min(T *mat, int rows, int cols, bool horizontal = true) {
 			   horizontal --> normalize the matrix horizontally or vertically (default true)
 */
 double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizontal = true);
+double* vec_normalize(double *vec, int size, bool inplace);
 
 /*
 	Function: Scale the matrix

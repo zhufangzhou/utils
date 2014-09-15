@@ -69,6 +69,9 @@ double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizo
 
 	return mat_t;
 }
+double *vec_normalize(double *vec, int size, bool inplace) {
+	return mat_normalize(vec, 1, size, inplace, HORIZONTAL);
+}
 
 /*
 	Function: Scale the matrix
