@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <vector>
 
+#define eps 1e-5
 #define HORIZONTAL 1
 #define VERTICAL 0
 #define ALL -1
@@ -17,6 +18,9 @@
 #define NOT_INPLACE false
 #define ASC 1
 #define DESC -1
+#define INF 0x7fffffff
+
+#define zero(a) ((a) < eps && (a) > -eps)
 
 /*
 	Class: record elapsed time
@@ -228,8 +232,9 @@ int* argsort(T *mat, int rows, int cols, int target, int asc = ASC, int *idx = N
 		while (u <= v) {
 			while (u <= v && asc*mat[idx[u]*cols + target] <= asc*mat[idx[from]*cols + target]) u++;
 			while (u <= v && asc*mat[idx[v]*cols + target] >= asc*mat[idx[from]*cols + target]) v--;
-			if (u <= v) 
+			if (u <= v) {
 				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+			}
 			
 		}
 		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
@@ -262,10 +267,7 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 	int st_head = 0, u, v, tmp, *m_stack = new int[rows*2], from, to;
 	
 	// get an ordered sequence start from 0
-	if (idx == NULL)
-		idx = ordered_sequence<int>(active_row_size);				// need to allocate space
-	else
-		idx = ordered_sequence<int>(active_row_size, idx);			// do not need to allocate space
+	idx = ordered_sequence<int>(active_row_size, idx);			// do not need to allocate space
 	
 	// check argument
 	if (asc != 1 && asc != -1) {
@@ -289,8 +291,9 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 		while (u <= v) {
 			while (u <= v && asc*mat[active_row[idx[u]]*cols + target] <= asc*mat[active_row[idx[from]]*cols + target]) u++;
 			while (u <= v && asc*mat[active_row[idx[v]]*cols + target] >= asc*mat[active_row[idx[from]]*cols + target]) v--;
-			if (u <= v) 
+			if (u <= v) {
 				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+			}
 		}
 		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
 		
@@ -348,6 +351,8 @@ T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
 
 	return ret;
 }
+
+int* random_sample(int size, int m, int *idx = NULL); 
 
 /*
 	Function: return max vector of a matrix

@@ -35,6 +35,41 @@ int *gen_imat(int rows, int cols) {
 }
 
 /*
+	Function: Randomly sample m instances from n instances, return m*cols matrix
+	Arguments: mat --> data matrix
+			   rows, cols --> shape of the matrix
+			   m --> size of instances to be sample from matrix
+*/
+int* random_sample(int size, int m, int *idx) {
+	int tmp, instance, u, end;
+	idx = ordered_sequence(size, idx);
+	if (m > size) {
+		std::cout << "m must less than the total instances" << std::endl;
+		return NULL;
+	} else if (m == size) {
+		return idx;
+	}
+
+	// we just need to sample the small part
+	if (m * 2 <= size) {
+		end = m;	// use 0~m
+		u = 0;
+	} else {
+		end = size - m;		// use size-m ~ size
+		u = size - m;
+	}
+	// sample index
+	for (int i = 0; i < end; i++) {
+		instance = r.next_int(i, size);
+		tmp = idx[instance]; idx[instance] = idx[i]; idx[i] = tmp;
+	}
+	end = u + m;
+	// sort the index to return to original order
+	std::sort(idx + u, idx + end);
+	return idx;
+}
+
+/*
 	Function: normalize the matrix
 	Arguments: mat --> data matrix
 			   rows, cols --> shape of the matrix
