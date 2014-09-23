@@ -9,6 +9,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <sstream>
 
 #define eps 1e-5
 #define HORIZONTAL 1
@@ -37,12 +38,22 @@ class m_timer {
 			tic_time = clock();
 			is_tic = true;
 		}
-		void toc(char* msg = NULL) {
+		void tic(char* msg) {
 			if (msg != NULL) {
 				std::cout << std::string(msg) << std::endl;
 			}
+			tic();
+		}
+		void tic(std::string msg) {
+			if (msg != "")
+				tic(msg.c_str());
+			else
+				tic();
+		}
+
+		void toc() {
 			if (!is_tic) {
-				std::cout << "please call `tic` first." << std::endl;
+				std::cerr << "please call `tic` first." << std::endl;
 			} else {
 				std::cout << "Time elapsed: "
 					<< ((double)(clock() - tic_time)) / CLOCKS_PER_SEC
@@ -50,6 +61,18 @@ class m_timer {
 					<< std::endl;
 			}
 			is_tic = false;
+		}
+		void toc(char* msg) {
+			if (msg != NULL) {
+				std::cout << std::string(msg) << std::endl;
+			}
+			toc();
+		}
+		void toc(std::string msg) {
+			if (msg != "")
+				toc(msg.c_str());
+			else 
+				toc();
 		}
 };
 
@@ -68,8 +91,8 @@ class m_random {
 		// return a random integer between `begin` and `end` ( [begin, end) )
 		int next_int(int begin, int end) {
 			if (begin > end) {
-				std::cout << "In `next_int`, `end` must larger than `begin`." << std::endl;
-				exit(1);
+				std::cerr << "In `next_int`, `end` must larger than `begin`." << std::endl;
+				exit(EXIT_FAILURE);
 			}
 			return rand() % (end - begin) + begin;
 		}
@@ -80,8 +103,8 @@ class m_random {
 		// return a real number between `begin` and `end` ( [begin, end] )
 		double next_double(double begin, double end) {
 			if (begin > end) {
-				std::cout << "In `next_int`, `end` must larger than `begin`." << std::endl;
-				exit(1);
+				std::cerr << "In `next_int`, `end` must larger than `begin`." << std::endl;
+				exit(EXIT_FAILURE);
 			}
 			return (double)rand() / RAND_MAX * (end - begin) + begin;
 		}
@@ -156,7 +179,8 @@ int* argsort(T *arr, int size, int asc = ASC) {
 	
 	// check argument
 	if (asc != 1 && asc != -1) {
-		std::cout << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		std::cerr << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	// if array size is too small, just return idx
@@ -212,7 +236,8 @@ int* argsort(T *mat, int rows, int cols, int target, int asc = ASC, int *idx = N
 	
 	// check argument
 	if (asc != 1 && asc != -1) {
-		std::cout << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		std::cerr << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	// if array size is too small, just return idx
@@ -271,15 +296,16 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 	
 	// check argument
 	if (asc != 1 && asc != -1) {
-		std::cout << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		std::cerr << "The third arguments must be +1 or -1. +1 means ascent, -1 means descent." << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	// if array size is too small, just return idx
-	if (rows <= 1) return idx;
+	if (active_row_size <= 1) return idx;
 
 	// quick sort
 	m_stack[st_head++] = 0;
-	m_stack[st_head++] = rows;
+	m_stack[st_head++] = active_row_size;
 	while (st_head != 0) {
 		from = m_stack[st_head - 2];
 		to = m_stack[st_head - 1];
@@ -318,30 +344,16 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 			   rows, cols --> shape of the matrix
 			   m --> size of instances to be sample from matrix
 */
+int* random_sample(int size, int m, int *idx = NULL); 
 template <class T>
 T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
-	int *idx = ordered_sequence(rows), tmp, instance, u, end;
+	int *idx, tmp, instance, u, end;
 	if (m > rows) {
-		std::cout << "m must less than the total instances" << std::endl;
+		std::cerr << "m must less than the total instances" << std::endl;
 		return NULL;
 	}
-
-	// we just need to sample the small part
-	if (m * 2 <= rows) {
-		end = m;	// use 0~m
-		u = 0;
-	} else {
-		end = rows - m;		// use rows-m ~ rows
-		u = rows - m;
-	}
-	// sample index
-	for (int i = 0; i < end; i++) {
-		instance = r.next_int(i, rows);
-		tmp = idx[instance]; idx[instance] = idx[i]; idx[i] = tmp;
-	}
-	end = u + m;
-	// sort the index to return to original order
-	std::sort(idx + u, idx + end);
+	idx = ordered_sequence(rows);
+	idx = random_sample(rows, m, idx);
 	if(ret == NULL)
 		ret = new T[m * cols];
 	// copy corresponding rows to new matrix
@@ -349,10 +361,11 @@ T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
 		memcpy(ret + (i - u) * cols, mat + idx[i] * cols, sizeof(T)*cols);
 	}
 
+	delete[] idx;
 	return ret;
 }
 
-int* random_sample(int size, int m, int *idx = NULL); 
+
 
 /*
 	Function: return max vector of a matrix
@@ -471,8 +484,8 @@ T* mat_accumulate(T *mat, int rows, int cols, int horizontal = HORIZONTAL) {
 			}
 		}
 	} else {
-		std::cout << "function mat_accumulate: invalid horizontal argument. must be `HORIZONTAL`, `VERTICAL` or `ALL`" << std::endl;
-		exit(1);
+		std::cerr << "function mat_accumulate: invalid horizontal argument. must be `HORIZONTAL`, `VERTICAL` or `ALL`" << std::endl;
+		exit(EXIT_FAILURE);
 	}
 	return accu_vec;	
 }

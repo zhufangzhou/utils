@@ -44,7 +44,7 @@ int* random_sample(int size, int m, int *idx) {
 	int tmp, instance, u, end;
 	idx = ordered_sequence(size, idx);
 	if (m > size) {
-		std::cout << "m must less than the total instances" << std::endl;
+		std::cerr << "m must less than the total instances" << std::endl;
 		return NULL;
 	} else if (m == size) {
 		return idx;
@@ -120,8 +120,8 @@ double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, d
 	double* mat_t, *max_vec, *min_vec;
 	// check arguments
 	if (start > end) {
-		std::cout << "`end` must larger than `start`" << std::endl;
-		return NULL;
+		std::cerr << "`end` must larger than `start`" << std::endl;
+		exit(EXIT_FAILURE);
 	}
 	
 	if (inplace) {
