@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Utils.h"
 #include "Parallel.h"
 
@@ -17,6 +16,22 @@ void test_gen_mat() {
 	int *mat;
 	mat = gen_imat(3, 3, 0, 10);
 	print_mat(mat, 3, 3, "randomly generate a matrix");
+	delete[] mat;
+}
+
+void gen_test_dataset() {
+	int n = 2000000, m = 100;
+	double *mat;
+	FILE *fp = fopen("train.libfm", "r");
+	mat = gen_dmat(n, m, 0, 100);
+	for(int i = 0; i < n; i++) {
+		fprintf(fp, "%d", r.next_int(0,2));
+		for(int j = 0; j < m; j++) {
+			fprintf(fp, " %d:%lf", j+1, mat[i*m+j]);
+		}
+		fprintf(fp, "\n");
+	}
+
 	delete[] mat;
 }
 
@@ -120,6 +135,7 @@ int main(int argc, char** argv) {
 	//test_normalize();
 	//test_scale();
 //	test_parallel_max();
-	test_parallel_normalize();
+//	test_parallel_normalize();
+	gen_test_dataset();
 	return 0;
 }

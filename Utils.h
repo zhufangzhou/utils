@@ -20,8 +20,7 @@
 #define ASC 1
 #define DESC -1
 #define INF 0x7fffffff
-
-#define zero(a) ((a) < eps && (a) > -eps)
+#define is_zero(a) ((a) < eps && (a) > -eps)
 
 /*
 	Class: record elapsed time

@@ -1,2 +1,2 @@
 util: main.cpp
-	g++ main.cpp Utils.cpp -o util -lm -std=c++0x -Wno-write-strings
+	g++ -g main.cpp Utils.cpp -o util -lm -std=c++0x -Wno-write-strings
