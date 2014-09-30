@@ -199,8 +199,9 @@ int* argsort(T *arr, int size, int asc = ASC) {
 		while (u <= v) {
 			while (u <= v && asc*arr[idx[u]] <= asc*arr[idx[from]]) u++;
 			while (u <= v && asc*arr[idx[v]] >= asc*arr[idx[from]]) v--;
-			if (u <= v) 
+			if (u <= v) {
 				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+			}
 			
 		}
 		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
