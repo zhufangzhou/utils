@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include "Parallel.h"
+#include "cmdLine.h"
 
 void test_argsort() {
 	int iarr[] = { 2, 4, 1, 5, 3 }, *idx;

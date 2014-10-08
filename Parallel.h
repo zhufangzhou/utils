@@ -304,7 +304,7 @@ double* mat_parallel_scale(double *mat, int rows, int cols, bool inplace, double
 */
 template <class T>
 void block_accumulate(T *mat, int rows, int cols, int block_start, int block_end, T* accu_vec, bool horizontal = HORIZONTAL) {
-	if(horizontal = HORIZONTAL) {
+	if(horizontal == HORIZONTAL) {
 		for (int i = block_start; i < block_end; i++) {
 			accu_vec[i] = (T)0;
 			for (int j = 0; j < cols; j++) {
