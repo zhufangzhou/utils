@@ -75,41 +75,6 @@ class m_timer {
 		}
 };
 
-class m_random {
-	public:
-		m_random() {
-			srand((unsigned int)time(NULL));
-		}
-
-		~m_random() { }
-		
-		// return a random integer
-		int next_int() {
-			return rand();
-		}
-		// return a random integer between `begin` and `end` ( [begin, end) )
-		int next_int(int begin, int end) {
-			if (begin > end) {
-				std::cerr << "In `next_int`, `end` must larger than `begin`." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			return rand() % (end - begin) + begin;
-		}
-		// return a real number between 0 and 1 ( [0, 1] )
-		double next_double() {
-			return (double)rand() / RAND_MAX;
-		}
-		// return a real number between `begin` and `end` ( [begin, end] )
-		double next_double(double begin, double end) {
-			if (begin > end) {
-				std::cerr << "In `next_int`, `end` must larger than `begin`." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			return (double)rand() / RAND_MAX * (end - begin) + begin;
-		}
-
-};
-static m_random r;
 static m_timer timer;
 /*
 	Function: generate a order sequence

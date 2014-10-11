@@ -50,16 +50,30 @@ public:
 		}
 	}
 
-	const std::string registerParameter(std::string opt_name, std::string info_content) {
+	const std::string registerOption(std::string opt_name, std::string info_content) {
 		info[opt_name] = info_content;
 		return opt_name;
 	}
 
-	void checkParameters() {
+	void checkOption() {
 		for (auto it = option.begin(); it != option.end(); it++) {
 			if (info.find(it->first) == info.end()) {
 				throw "the option " + it->first + " do not register, please check again";
 			}
+		}
+	}
+
+	void displayOption() {
+		for (auto it = info.begin(); it != info.end(); it++) {
+			std::cout << "-" << it->first << ":\t" << it->end << std::endl;
+		}
+	}
+
+	std::string getOptionValue(std::string opt_name) {
+		if (option.find(opt_name) != option.end()) {
+			return option[opt_name];
+		} else {
+			throw "no option named " + opt_name;
 		}
 	}
 
