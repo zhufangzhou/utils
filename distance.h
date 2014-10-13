@@ -10,8 +10,6 @@
 #include <algorithm>
 #include <cstring>
 
-int bit_count(int x);
-int lcs(char *x, char *y);
 
 int bit_count(int x) {
 	int count = 0;
@@ -32,13 +30,15 @@ int lcs(char *x, char *y) {
 	dp[0] = new int[2*len_y];
 	dp[1] = dp[0] + len_y;
 	
-	for (int j = 0; j < len_y; j++) dp[0][j] = x[0] == y[j];
+	for (int j = 0; j < len_y; j++) {
+		dp[0][j] = (j==0?0:dp[0][j-1]) + (x[0] == y[j]);
+	}
 	
 	now = 1;
 	for (int i = 1; i < len_x; i++) {
 		for (int j = 0; j < len_y; j++) {
 			if (x[i] == y[j]) {
-				dp[now][j] = j == 0 ? 0 : dp[now^1][j-1];
+				dp[now][j] = j == 0 ? 1 : dp[now^1][j-1]+1;
 			} else {
 				dp[now][j] = std::max(dp[now^1][j], j == 0 ? 0 : dp[now][j-1]);
 			}
@@ -163,7 +163,7 @@ double jaccard_distance(T *x, int dim_x, T *y, int dim_y) {
 
 
 int edit_dist(char *x, char *y) {
-	return 0;
+	return strlen(x) + strlen(y) - 2*lcs(x, y);
 }
 
 int hamming_dist(int x, int y) {

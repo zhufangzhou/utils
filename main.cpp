@@ -1,8 +1,9 @@
-#include "Utils.h"
-//#include "Parallel.h"
-//#include "cmdLine.h"
+#include "utils.h"
+#include "Parallel.h"
+#include "cmdLine.h"
 #include "distance.h"
-/*
+#include "random.h"
+
 void test_argsort() {
 	int iarr[] = { 2, 4, 1, 5, 3 }, *idx;
 	double darr[] = { 2.1, 4.1, 1.1, 5.1, 3.1 };
@@ -129,7 +130,18 @@ void test_parallel_normalize() {
 
 	delete[] mat;
 }
-*/
+
+void test_lcs() {
+	std::cout << lcs("abc", "advibismc") << std::endl;
+}
+
+void test_edit_dist() {
+	char x[10], y[10];
+	while (~scanf("%s%s", x, y)) {
+		std::cout << edit_dist(x, y) << std::endl;
+	}
+}
+
 int main(int argc, char** argv) {
 	//test_argsort();
 	//test_gen_mat();
@@ -139,6 +151,7 @@ int main(int argc, char** argv) {
 //	test_parallel_max();
 //	test_parallel_normalize();
 	//gen_test_dataset();
-
+	//test_lcs();
+	test_edit_dist();
 	return 0;
 }
