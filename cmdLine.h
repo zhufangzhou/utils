@@ -65,7 +65,7 @@ public:
 
 	void displayOption() {
 		for (auto it = info.begin(); it != info.end(); it++) {
-			std::cout << "-" << it->first << ":\t" << it->end << std::endl;
+			std::cout << "-" << it->first << ":\t" << it->second << std::endl;
 		}
 	}
 

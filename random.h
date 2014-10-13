@@ -1,13 +1,12 @@
+#pragma once
 #ifndef __RANDOM_H
 #define __RANDOM_H
+
 
 #include <iostream>
 #include <cmath>
 
-double draw_uniform();
-double draw_gaussian();
-double draw_gaussian(double mu, double sigma);
-double draw_gamma(double alpha, double beta = 1.0);
+
 
 class m_random {
 	public:
@@ -51,7 +50,7 @@ double draw_uniform() {
 	double u;
 	// return value must bigger than 0
 	do {
-		u = m_random::getInstance().getInt() / (double)(RAND_MAX+1);	
+		u = m_random::getInstance().next_int() / ((double)(RAND_MAX)+1);	
 	} while (u == 0.0);
 	return u;
 }
@@ -117,7 +116,7 @@ double draw_gamma(double alpha, double beta) {
 		u = draw_uniform();
 		return x*pow(u,1.0/alpha);
 	} else {
-		throw "bad alpha value"
+		throw "bad alpha value";
 	}
 }
 

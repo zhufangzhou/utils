@@ -1,7 +1,8 @@
 #include "Utils.h"
-#include "Parallel.h"
-#include "cmdLine.h"
-
+//#include "Parallel.h"
+//#include "cmdLine.h"
+#include "distance.h"
+/*
 void test_argsort() {
 	int iarr[] = { 2, 4, 1, 5, 3 }, *idx;
 	double darr[] = { 2.1, 4.1, 1.1, 5.1, 3.1 };
@@ -26,7 +27,7 @@ void gen_test_dataset() {
 	FILE *fp = fopen("train.libfm", "r");
 	mat = gen_dmat(n, m, 0, 100);
 	for(int i = 0; i < n; i++) {
-		fprintf(fp, "%d", r.next_int(0,2));
+		fprintf(fp, "%d", m_random::getInstance().next_int(0,2));
 		for(int j = 0; j < m; j++) {
 			fprintf(fp, " %d:%lf", j+1, mat[i*m+j]);
 		}
@@ -128,7 +129,7 @@ void test_parallel_normalize() {
 
 	delete[] mat;
 }
-
+*/
 int main(int argc, char** argv) {
 	//test_argsort();
 	//test_gen_mat();
@@ -137,6 +138,7 @@ int main(int argc, char** argv) {
 	//test_scale();
 //	test_parallel_max();
 //	test_parallel_normalize();
-	gen_test_dataset();
+	//gen_test_dataset();
+
 	return 0;
 }

@@ -1,6 +1,6 @@
 #include "Utils.h"
-extern m_random r;
-extern m_timer timer;
+#include "random.h"
+//extern m_timer timer;
 
 /*
 	Function: Generate a random double matrix
@@ -8,28 +8,28 @@ extern m_timer timer;
 double* gen_dmat(int rows, int cols, double start, double end) {
 	double *mat = new double[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_double(start, end);
+		mat[i] = m_random::getInstance().next_double(start, end);
 	}
 	return mat;
 }
 double* gen_dmat(int rows, int cols) {
 	double *mat = new double[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_double();
+		mat[i] = m_random::getInstance().next_double();
 	}
 	return mat;
 }
 int* gen_imat(int rows, int cols, int start, int end) {
 	int *mat = new int[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_int(start, end);
+		mat[i] = m_random::getInstance().next_int(start, end);
 	}
 	return mat;
 }
 int *gen_imat(int rows, int cols) {
 	int *mat = new int[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
-		mat[i] = r.next_int();
+		mat[i] = m_random::getInstance().next_int();
 	}
 	return mat;
 }
@@ -60,7 +60,7 @@ int* random_sample(int size, int m, int *idx) {
 	}
 	// sample index
 	for (int i = 0; i < end; i++) {
-		instance = r.next_int(i, size);
+		instance = m_random::getInstance().next_int(i, size);
 		tmp = idx[instance]; idx[instance] = idx[i]; idx[i] = tmp;
 	}
 	end = u + m;
