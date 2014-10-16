@@ -9,6 +9,29 @@
 #include <thread>
 #include <algorithm>
 #include <vector>
+#include "container.h"
+
+template <class T>
+struct item {
+	int item_id;
+	T val;
+	void set(int _id, T _val) {
+		item_id = _id;
+		val = _val;
+	}
+	bool operator < (item &x) {
+		return this->val < x.val;
+	}
+	bool operator > (item &x) {
+		return this->val > x.val;
+	}
+	bool operator == (item &x) {
+		return this->val == x.val;
+	}
+	T operator * (int x) {
+		return val*x;
+	}
+};
 
 struct parallel_unit{
 	unsigned long const num_threads;	// launch `num_threads` threads
@@ -22,7 +45,7 @@ struct parallel_unit{
 	Arguments: length --> the length to be paralleled
 			   min_per_thread -> the minimum length each thread deal with 
 */
-struct parallel_unit init_block(int length, unsigned long const min_per_thread = 100) {
+struct parallel_unit init_block(int length, unsigned long const min_per_thread = 10) {
 	unsigned long const max_threads = (length + min_per_thread - 1) / min_per_thread;
 	unsigned long const hardware_threads = std::thread::hardware_concurrency();
 	unsigned long const num_threads = std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
@@ -369,5 +392,69 @@ T* mat_parallel_accumulate(T *mat, int rows, int cols, int horizontal = HORIZONT
 		exit(1);
 	}
 	return accu_vec;
+}
+
+
+/*
+	MergeSort: Parallel Version
+ */
+template <class T>
+void block_sort(T* start, T* end) {
+	std::sort(start, end);
+}
+template <class T>
+void parallel_mergesort(T *vec, int size) {
+	struct parallel_unit pu = init_block(size);
+	int block_start, block_end;
+	block_start = 0;
+	std::vector<std::thread> threads(pu.num_threads - 1);
+	// sort
+	for (int i = 0; i < pu.num_threads - 1; i++) {
+		block_end = block_start + pu.block_size;
+		threads[i] = std::thread(block_sort<int>, vec+block_start, vec+block_end);
+		block_start = block_end;
+	}
+	block_sort(vec+block_start, vec+size);
+	std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+	
+	// merge
+	int* block_end_idx = new int[pu.num_threads];
+	int* block_idx = new int[pu.num_threads];
+	int merge_count = 0;
+	T* ret;
+	heap<item<T> > my_heap(MIN_HEAP);
+	item<T> item_temp;
+	for (int i = 0; i < pu.num_threads - 1; i++) {
+		block_idx[i] = 0 + i*pu.block_size;
+		block_end_idx[i] = block_idx[i] + pu.block_size;
+	}
+	block_idx[pu.num_threads-1] = (pu.num_threads-1)*pu.block_size; 
+	block_end_idx[pu.num_threads-1] = size;
+	// initialize the heap
+	for (int i = 0; i < pu.num_threads; i++) {
+		int &cur_pos = block_idx[i];
+		if (cur_pos < block_end_idx[i]) {
+			item_temp.set(i, vec[cur_pos]);
+			my_heap.push(item_temp);
+			cur_pos++;
+		}
+	}
+	ret = new T[size];
+	while (merge_count < size) {
+		if (!my_heap.is_empty()) {
+			item_temp = my_heap.extract();
+			int &cur_pos = block_idx[item_temp.item_id];
+			ret[merge_count++] = item_temp.val;
+			if (cur_pos < block_end_idx[item_temp.item_id]) {
+				item_temp.val = vec[cur_pos];
+				my_heap.push(item_temp);	
+				cur_pos++;
+			}
+		} else {
+			throw "error occur when merge";
+		}
+	}
+	memcpy(vec, ret, sizeof(T)*size);
+	delete[] ret;
 }
 #endif

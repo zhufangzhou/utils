@@ -3,6 +3,7 @@
 #include "cmdLine.h"
 #include "distance.h"
 #include "random.h"
+#include "container.h"
 
 void test_argsort() {
 	int iarr[] = { 2, 4, 1, 5, 3 }, *idx;
@@ -142,16 +143,39 @@ void test_edit_dist() {
 	}
 }
 
+void test_parallel_mergesort() {
+	int size = 20;
+	int *vec = gen_ivec(size, 0, 100);
+	print_vec(vec, size, "original vector");
+	parallel_mergesort(vec, size);
+	print_vec(vec, size, "after sort");
+}
+
+void test_heap() {
+	int size = 10;
+	int *vec = gen_ivec(size, 0, 20);
+	//heap<int> my_heap(vec, vec+size, MIN_HEAP);
+	heap<int> my_heap(MIN_HEAP);
+	for (int i = 0; i < size; i++) my_heap.push(vec[i]);
+	my_heap.print_heap();
+	while (!my_heap.is_empty()) {
+		std::cout << my_heap.extract() << "\t";
+	}
+	std::cout << std::endl;
+}
+
 int main(int argc, char** argv) {
 	//test_argsort();
 	//test_gen_mat();
 	//test_max_min_mat();
 	//test_normalize();
 	//test_scale();
-//	test_parallel_max();
-//	test_parallel_normalize();
+	//test_parallel_max();
+	//test_parallel_normalize();
 	//gen_test_dataset();
 	//test_lcs();
-	test_edit_dist();
+	//test_edit_dist();
+	test_parallel_mergesort();
+	//test_heap();
 	return 0;
 }

@@ -92,13 +92,6 @@ T* ordered_sequence(T size, T *idx = NULL, T start_from = 0) {
 	return idx;
 }
 
-/*
-	Function: Generate a random double matrix
-*/
-double* gen_dmat(int rows, int cols, double start, double end);
-double* gen_dmat(int rows, int cols);
-int* gen_imat(int rows, int cols, int start, int end);
-int *gen_imat(int rows, int cols);
 
 /*
 	Function: print an vector
@@ -472,6 +465,12 @@ double* gen_dmat(int rows, int cols) {
 	}
 	return mat;
 }
+double* gen_dvec(int size) {
+	return gen_dmat(1, size);
+}
+double* gen_dvec(int size, double start, double end) {
+	return gen_dmat(1, size, start, end);
+}
 int* gen_imat(int rows, int cols, int start, int end) {
 	int *mat = new int[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
@@ -485,6 +484,12 @@ int *gen_imat(int rows, int cols) {
 		mat[i] = m_random::getInstance().next_int();
 	}
 	return mat;
+}
+int* gen_ivec(int size) {
+	return gen_imat(1, size);
+}
+int* gen_ivec(int size, int start, int end) {
+	return gen_imat(1, size, start, end);
 }
 
 /*
