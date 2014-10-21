@@ -45,7 +45,7 @@ struct parallel_unit{
 	Arguments: length --> the length to be paralleled
 			   min_per_thread -> the minimum length each thread deal with 
 */
-struct parallel_unit init_block(int length, unsigned long const min_per_thread = 10) {
+struct parallel_unit init_block(int length, unsigned long const min_per_thread = 100) {
 	unsigned long const max_threads = (length + min_per_thread - 1) / min_per_thread;
 	unsigned long const hardware_threads = std::thread::hardware_concurrency();
 	unsigned long const num_threads = std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
@@ -408,13 +408,20 @@ void parallel_mergesort(T *vec, int size) {
 	int block_start, block_end;
 	block_start = 0;
 	std::vector<std::thread> threads(pu.num_threads - 1);
+	if (size < 1000) {
+		std::sort(vec, vec+size);
+		return ;
+	}
+
 	// sort
 	for (int i = 0; i < pu.num_threads - 1; i++) {
 		block_end = block_start + pu.block_size;
-		threads[i] = std::thread(block_sort<int>, vec+block_start, vec+block_end);
+//		threads[i] = std::thread(block_sort<T>, vec+block_start, vec+block_end);
+		threads[i] = std::thread(parallel_mergesort<T>, vec+block_start, pu.block_size);
 		block_start = block_end;
 	}
-	block_sort(vec+block_start, vec+size);
+	//block_sort(vec+block_start, vec+size);
+	parallel_mergesort(vec+block_start, size-block_start);
 	std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
 	
 	// merge

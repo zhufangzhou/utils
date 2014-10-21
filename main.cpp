@@ -144,24 +144,45 @@ void test_edit_dist() {
 }
 
 void test_parallel_mergesort() {
-	int size = 20;
-	int *vec = gen_ivec(size, 0, 100);
-	print_vec(vec, size, "original vector");
-	parallel_mergesort(vec, size);
-	print_vec(vec, size, "after sort");
+	int size = 10000000;
+	int *vec = gen_ivec(size, 0, 100000);
+	int *temp = new int[size];
+	memcpy(temp, vec, sizeof(int)*size);
+	try {
+	//	print_vec(vec, size, "original vector");
+		timer.tic();
+		parallel_mergesort(vec, size);
+		timer.toc();
+	//	print_vec(vec, size, "after sort");
+		timer.tic();
+		std::sort(temp, temp+size);
+		timer.toc();
+	} catch (std::string &e) {
+		std::cerr << std::endl << "ERROR: " << e << std::endl;
+	} catch (char const* &e) {
+		std::cerr << std::endl << "ERROR: " << e << std::endl;
+	}
 }
 
 void test_heap() {
 	int size = 10;
 	int *vec = gen_ivec(size, 0, 20);
-	//heap<int> my_heap(vec, vec+size, MIN_HEAP);
-	heap<int> my_heap(MIN_HEAP);
-	for (int i = 0; i < size; i++) my_heap.push(vec[i]);
+	heap<int> my_heap(vec, vec+size, MIN_HEAP);
+	//heap<int> my_heap(MIN_HEAP);
+	//for (int i = 0; i < size; i++) my_heap.push(vec[i]);
 	my_heap.print_heap();
 	while (!my_heap.is_empty()) {
 		std::cout << my_heap.extract() << "\t";
 	}
 	std::cout << std::endl;
+}
+
+void test_weighted_median() {
+	int val[] = {5,3,6,1,4};
+	double w[] = {1,1,1,6,1};
+	print_vec(val, 5, "vector");
+	print_vec(w, 5, "weight");
+	std::cout << "weighted median:" << std::endl << weighted_median(val, w, 5) << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -175,7 +196,8 @@ int main(int argc, char** argv) {
 	//gen_test_dataset();
 	//test_lcs();
 	//test_edit_dist();
-	test_parallel_mergesort();
+	//test_parallel_mergesort();
 	//test_heap();
+	test_weighted_median();
 	return 0;
 }

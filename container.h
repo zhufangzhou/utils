@@ -16,7 +16,6 @@ private:
 	int heap_size;
 	int inc;
 	int mode;
-	T* data;
 	void init(int init_size, int heap_mode) {
 		max_size = init_size;
 		mode = heap_mode;
@@ -50,7 +49,9 @@ private:
 				extrema = data[rchild(pos)];
 			}
 
-			if (lchild(pos) < heap_size && extrema == data[lchild(pos)]) {
+			if (extrema == data[pos]) {
+				break;
+			} else if (lchild(pos) < heap_size && extrema == data[lchild(pos)]) {
 				data[lchild(pos)] = data[pos];
 				data[pos] = extrema;
 				pos = lchild(pos);
@@ -70,6 +71,7 @@ private:
 		}
 	}
 public:
+	T* data;
 	heap(T* start, T* end, int heap_mode) {
 		init(end-start, heap_mode);	
 		memcpy(data, start, sizeof(T)*(end-start));
@@ -90,7 +92,8 @@ public:
 			throw "can not extract from an empty heap";
 		
 		ret = data[0];
-		data[0] = data[--heap_size];	
+		data[0] = data[heap_size-1];	
+		heap_size--;
 		modify(0);
 		return ret;
 	}
@@ -101,9 +104,8 @@ public:
 		if (heap_size+1 > max_size) {
 			expand();
 		}
-		data[heap_size] = val;
-		modify(heap_size);
-		heap_size++;
+		data[heap_size++] = val;
+		modify(heap_size-1);
 	}
 	void print_heap() {
 		print_vec(data, heap_size, "heap data");

@@ -83,12 +83,12 @@ static m_timer timer;
 			   start_from --> the number sequence start from, default is 0
 */
 template <class T>
-T* ordered_sequence(T size, T *idx = NULL, T start_from = 0) {
+T* ordered_sequence(int size, T *idx = NULL, T start_from = 0) {
 	// T *idx = new T[size];
 	if (idx == NULL) {
 		idx = new T[size];
 	}
-	for (T i = 0; i < size; i++) idx[i] = i + start_from;
+	for (int i = 0; i < size; i++) idx[i] = i + start_from;
 	return idx;
 }
 
@@ -158,8 +158,9 @@ int* argsort(T *arr, int size, int asc = ASC) {
 		while (u <= v) {
 			while (u <= v && asc*arr[idx[u]] <= asc*arr[idx[from]]) u++;
 			while (u <= v && asc*arr[idx[v]] >= asc*arr[idx[from]]) v--;
-			if (u <= v) 
+			if (u <= v) {
 				tmp = idx[u]; idx[u] = idx[v]; idx[v] = tmp;
+			}
 			
 		}
 		tmp = idx[from]; idx[from] = idx[v]; idx[v] = tmp;
@@ -302,7 +303,40 @@ int* partial_argsort(T *mat, int rows, int cols, int *active_row, int active_row
 			   rows, cols --> shape of the matrix
 			   m --> size of instances to be sample from matrix
 */
-int* random_sample(int size, int m, int *idx = NULL); 
+int* random_sample(int size, int m, int *idx) {
+	int tmp, instance, u, end;
+	idx = ordered_sequence(size, idx);
+	if (m > size) {
+		std::cerr << "m must less than the total instances" << std::endl;
+		return NULL;
+	} else if (m == size) {
+		return idx;
+	}
+
+	// we just need to sample the small part
+	if (m * 2 <= size) {
+		end = m;	// use 0~m
+		u = 0;
+	} else {
+		end = size - m;		// use size-m ~ size
+		u = size - m;
+	}
+	// sample index
+	for (int i = 0; i < end; i++) {
+		instance = m_random::getInstance().next_int(i, size);
+		tmp = idx[instance]; idx[instance] = idx[i]; idx[i] = tmp;
+	}
+	end = u + m;
+	// sort the index to return to original order
+	std::sort(idx + u, idx + end);
+	return idx;
+}
+/*
+	Function: Randomly sample m instances from n instances, return m*cols matrix
+	Arguments: mat --> data matrix
+			   rows, cols --> shape of the matrix
+			   m --> size of instances to be sample from matrix
+*/
 template <class T>
 T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
 	int *idx, tmp, instance, u, end;
@@ -310,7 +344,7 @@ T* random_sample(T *mat, int rows, int cols, int m, T *ret = NULL) {
 		std::cerr << "m must less than the total instances" << std::endl;
 		return NULL;
 	}
-	idx = ordered_sequence(rows);
+	idx = ordered_sequence<int>(rows);
 	idx = random_sample(rows, m, idx);
 	if(ret == NULL)
 		ret = new T[m * cols];
@@ -492,40 +526,6 @@ int* gen_ivec(int size, int start, int end) {
 	return gen_imat(1, size, start, end);
 }
 
-/*
-	Function: Randomly sample m instances from n instances, return m*cols matrix
-	Arguments: mat --> data matrix
-			   rows, cols --> shape of the matrix
-			   m --> size of instances to be sample from matrix
-*/
-int* random_sample(int size, int m, int *idx) {
-	int tmp, instance, u, end;
-	idx = ordered_sequence(size, idx);
-	if (m > size) {
-		std::cerr << "m must less than the total instances" << std::endl;
-		return NULL;
-	} else if (m == size) {
-		return idx;
-	}
-
-	// we just need to sample the small part
-	if (m * 2 <= size) {
-		end = m;	// use 0~m
-		u = 0;
-	} else {
-		end = size - m;		// use size-m ~ size
-		u = size - m;
-	}
-	// sample index
-	for (int i = 0; i < end; i++) {
-		instance = m_random::getInstance().next_int(i, size);
-		tmp = idx[instance]; idx[instance] = idx[i]; idx[i] = tmp;
-	}
-	end = u + m;
-	// sort the index to return to original order
-	std::sort(idx + u, idx + end);
-	return idx;
-}
 
 /*
 	Function: normalize the matrix
@@ -627,4 +627,50 @@ double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, d
 	return mat_t;
 }
 
+template <class T>
+T weighted_median(T* val, double* w, int start, int end, int* order = NULL) {
+	int mid;
+	double WL = 0, WG = 0;
+	if (end-start == 1) {
+		return val[0];
+	} else if (end-start == 2) {
+		if (w[0] > w[1]) return val[0];
+		else if (w[0] < w[1]) return val[1];
+		else return (val[0]+val[1]) / 2;
+	} else {
+		if (order == NULL) 
+			order = argsort(val, end-start, ASC);
+
+		mid = (end-start) / 2;	
+		for (int i = start; i < end; i++) {
+			if (i < mid) {
+				WL += w[order[i]];
+			} else if (i > mid) {
+				WG += w[order[i]];
+			}
+		}
+		if (WL < 0.5 && WG < 0.5) {
+			return val[order[mid]];
+		} else if (WL < 0.5) {
+			w[mid] += WG;
+			return weighted_median(val, w, start, mid+1, order);	
+		} else {
+			w[mid] += WL;
+			return weighted_median(val, w, mid, end, order);
+		}
+	}
+	return 0;	
+}
+
+template <class T>
+T weighted_median(T* val, double* w, int size) {
+	double* copy_w;
+	T ret;
+	copy_w = new double[size];
+	memcpy(copy_w, w, sizeof(double)*size);
+	vec_normalize(w, size, INPLACE);
+	ret = weighted_median(val, copy_w, 0, size);
+	delete[] copy_w;
+	return ret;
+}
 #endif
