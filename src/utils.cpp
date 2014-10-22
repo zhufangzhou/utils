@@ -69,6 +69,22 @@ double* gen_dvec(int size) {
 double* gen_dvec(int size, double start, double end) {
 	return gen_dmat(1, size, start, end);
 }
+double* gen_dzeros(int rows, int cols) {
+	double* mat = new double[rows*cols];
+	memset(mat, 0, sizeof(double)*rows*cols);
+	return mat;
+}
+double* gen_dzeros(int size) {
+	return gen_dzeros(1, size);
+}
+double* gen_dones(int rows, int cols) {
+	double* mat = new double[rows*cols];
+	for (int i = 0; i < rows*cols; i++) mat[i] = 1.0;
+	return mat;
+}
+double* gen_dones(int size) {
+	return gen_dones(1, size);
+}
 int* gen_imat(int rows, int cols, int start, int end) {
 	int *mat = new int[rows*cols];
 	for (int i = 0; i < rows*cols; i++) {
@@ -89,7 +105,22 @@ int* gen_ivec(int size) {
 int* gen_ivec(int size, int start, int end) {
 	return gen_imat(1, size, start, end);
 }
-
+int* gen_izeros(int rows, int cols) {
+	int* mat = new int[rows*cols];
+	memset(mat, 0, sizeof(int)*rows*cols);
+	return mat;
+}
+int* gen_izeros(int size) {
+	return gen_izeros(1, size);
+}
+int* gen_iones(int rows, int cols) {
+	int* mat = new int[rows*cols];
+	for (int i = 0; i < rows*cols; i++) mat[i] = 1;
+	return mat;
+}
+int* gen_iones(int size) {
+	return gen_iones(1, size);
+}
 
 /*
 	Function: normalize the matrix

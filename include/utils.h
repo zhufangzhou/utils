@@ -31,10 +31,18 @@ double* gen_dmat(int rows, int cols, double start, double end);
 double* gen_dmat(int rows, int cols);
 double* gen_dvec(int size);
 double* gen_dvec(int size, double start, double end);
+double* gen_dzeros(int size);
+double* gen_dzeros(int rows, int cols);
+double* gen_dones(int size);
+double* gen_dones(int rows, int cols);
 int* gen_imat(int rows, int cols, int start, int end);
 int *gen_imat(int rows, int cols);
 int* gen_ivec(int size);
 int* gen_ivec(int size, int start, int end);
+int* gen_izeros(int size);
+int* gen_izeros(int rows, int cols);
+int* gen_iones(int size);
+int* gen_iones(int rows, int cols);
 
 
 /*

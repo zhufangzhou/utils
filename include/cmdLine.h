@@ -35,10 +35,12 @@ public:
 						option[std::string(opt)] = std::string("1"); // if not specified value, give 1 for default means open this option
 						continue; // deal with this option name in next iteration
 					} else {
-						opt_val = ""; 
+						opt_val = new char[1];
+						opt_val[0] = '\0';
 					}
 				} else {
-					opt_val = "";
+					opt_val = new char[1];
+					opt_val[0] = '\0';
 				}
 				// give value to corresponding option name
 				option[std::string(opt)] = std::string(opt_val);
