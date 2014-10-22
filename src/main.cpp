@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <cmath>
 #include "Parallel.h"
 #include "cmdLine.h"
 #include "distance.h"
