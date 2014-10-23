@@ -45,13 +45,31 @@ struct parallel_unit{
 	Arguments: length --> the length to be paralleled
 			   min_per_thread -> the minimum length each thread deal with 
 */
-struct parallel_unit init_block(int length, unsigned long const min_per_thread = 100) {
-	unsigned long const max_threads = (length + min_per_thread - 1) / min_per_thread;
-	unsigned long const hardware_threads = std::thread::hardware_concurrency();
-	unsigned long const num_threads = std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
-	unsigned long const block_size = length / num_threads;
+struct parallel_unit init_block(int length, unsigned long const min_per_thread = 100, int specified_num_threads = -1) {
+	unsigned long max_threads;
+	unsigned long hardware_threads;
+	unsigned long num_threads;
+	unsigned long block_size;
+
+	if (specified_num_threads != -1 && specified_num_threads < 1) {
+		throw "`n_threads` must satisfy `n_threads` > 1 or `n_threads` == -1 (means max threads)";	
+	}
+
+	hardware_threads = std::thread::hardware_concurrency();
+	if (specified_num_threads == -1) {
+		max_threads = (length + min_per_thread - 1) / min_per_thread;
+	} else {
+		max_threads = specified_num_threads;
+	}
+
+	num_threads = std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
+	block_size = length / num_threads;
+
 	struct parallel_unit pu(num_threads, block_size);
 	return pu;
+}
+struct parallel_unit init_block(int length, int specified_num_threads) {
+	return init_block(length, 1, specified_num_threads);
 }
 
 

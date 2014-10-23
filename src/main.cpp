@@ -1,6 +1,6 @@
 #include "utils.h"
 #include <cmath>
-#include "Parallel.h"
+#include "parallel.h"
 #include "cmdLine.h"
 #include "distance.h"
 #include "random.h"
