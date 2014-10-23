@@ -186,6 +186,14 @@ void test_weighted_median() {
 	std::cout << "weighted median:" << std::endl << weighted_median(val, w, 5) << std::endl;
 }
 
+void test_is_number() {
+	std::string str, prt;
+	while (std::cin >> str) {
+		prt = is_number(str)?"True":"False";
+		std::cout << prt << std::endl;
+	}
+}
+
 int main(int argc, char** argv) {
 	//test_argsort();
 	//test_gen_mat();
@@ -199,6 +207,7 @@ int main(int argc, char** argv) {
 	//test_edit_dist();
 	//test_parallel_mergesort();
 	//test_heap();
-	test_weighted_median();
+	//test_weighted_median();
+	test_is_number();
 	return 0;
 }

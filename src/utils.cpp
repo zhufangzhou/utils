@@ -229,3 +229,22 @@ int* double2int(double* val, int size) {
 	return val_i;
 }
 
+
+bool is_number(std::string str) {
+	bool has_dot = false;	
+	if (!(str[0] == '+' || str[0] == '-' || isdigit(str[0]))) {
+		if (str[0] == '.')
+			has_dot = true;
+		else
+			return false;
+	}
+	for (int i = 1; i < str.length(); i++) {
+		if (str[i] == '.') {
+			if (has_dot) return false;
+			has_dot = true;	
+		} else if (!isdigit(str[i])) {
+			return false;
+		}
+	}
+	return true;
+}
