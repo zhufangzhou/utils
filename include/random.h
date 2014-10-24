@@ -31,7 +31,9 @@ class m_random {
 		int next_int() {
 			return rand();
 		}
-		// return a random integer between `begin` and `end` ( [begin, end) )
+		/**
+		 *  return a random integer between `begin` and `end` ( [begin, end) )
+		 */
 		int next_int(int begin, int end) {
 			if (begin > end) {
 				throw "In `next_int`, `end` must larger than `begin`.";
