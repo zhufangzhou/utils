@@ -23,6 +23,7 @@
 #define is_zero(a) ((a) < eps && (a) > -eps)
 
 bool is_number(std::string str);
+std::string color_msg (std::string msg, std::string color);
 int* random_sample(int size, int m, int *idx);
 int* double2int(double* val, int size);
 double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, double end, bool horizontal = false);

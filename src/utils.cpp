@@ -248,3 +248,18 @@ bool is_number(std::string str) {
 	}
 	return true;
 }
+
+std::string color_msg(std::string msg, std::string color) {
+	std::string control_str;
+	if (color == "black") control_str = "\033[;30m";
+	else if (color == "red") control_str = "\033[;31m";
+	else if (color == "green") control_str = "\033[;32m";
+	else if (color == "yellow") control_str = "\033[;33m";
+	else if (color == "blue") control_str = "\033[;34m";
+	else if (color == "purple") control_str = "\033[;35m";
+	else if (color == "dark green") control_str = "\033[;36m";
+	else if (color == "white") control_str = "\033[;37m";
+	else return NULL;
+	return control_str + msg;
+
+}
