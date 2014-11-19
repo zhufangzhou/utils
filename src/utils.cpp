@@ -260,6 +260,5 @@ std::string color_msg(std::string msg, std::string color) {
 	else if (color == "dark green") control_str = "\033[;36m";
 	else if (color == "white") control_str = "\033[;37m";
 	else return NULL;
-	return control_str + msg;
-
+	return control_str + msg + "\033[;\033[0m";
 }

@@ -62,17 +62,16 @@ class m_timer {
 			tic_time = clock();
 			is_tic = true;
 		}
-		void tic(char* msg) {
-			if (msg != NULL) {
-				std::cout << std::string(msg) << std::endl;
-			}
-			tic();
-		}
+		//void tic(char* msg) {
+			//if (msg != NULL) {
+				//std::cout << std::string(msg) << std::endl;
+			//}
+			//tic();
+		//}
 		void tic(std::string msg) {
 			if (msg != "")
-				tic(msg.c_str());
-			else
-				tic();
+				std::cout << msg << std::endl;
+			tic();
 		}
 
 		void toc() {
@@ -86,17 +85,16 @@ class m_timer {
 			}
 			is_tic = false;
 		}
-		void toc(char* msg) {
-			if (msg != NULL) {
-				std::cout << std::string(msg) << std::endl;
-			}
-			toc();
-		}
+		//void toc(char* msg) {
+			//if (msg != NULL) {
+				//std::cout << std::string(msg) << std::endl;
+			//}
+			//toc();
+		//}
 		void toc(std::string msg) {
 			if (msg != "")
-				toc(msg.c_str());
-			else 
-				toc();
+				std::cout << msg << std::endl;
+			toc();
 		}
 };
 
