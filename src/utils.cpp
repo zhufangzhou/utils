@@ -229,6 +229,12 @@ int* double2int(double* val, int size) {
 	return val_i;
 }
 
+int* float2int(float* val, int size) {
+	int* val_i = new int[size];
+	for (int i = 0; i < size; i++) val_i[i] = (int) val[i];
+	return val_i;
+}
+
 
 bool is_number(std::string str) {
 	bool has_dot = false;	
@@ -261,4 +267,20 @@ std::string color_msg(std::string msg, std::string color) {
 	else if (color == "white") control_str = "\033[;37m";
 	else return NULL;
 	return control_str + msg + "\033[;\033[0m";
+}
+
+std::string color_msg(float msg, std::string color) {
+	std::stringstream ss;
+	std::string msg_str;
+	ss << msg;
+	ss >> msg_str;
+	return color_msg(msg_str, color);
+}
+
+std::string color_msg(int msg, std::string color) {
+	std::stringstream ss;
+	std::string msg_str;
+	ss << msg;
+	ss >> msg_str;
+	return color_msg(msg_str, color);
 }

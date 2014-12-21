@@ -22,10 +22,13 @@
 #define INF 0x7fffffff
 #define is_zero(a) ((a) < eps && (a) > -eps)
 
-bool is_number(std::string str);
 std::string color_msg (std::string msg, std::string color);
+std::string color_msg (float msg, std::string color);
+std::string color_msg (int msg, std::string color);
+bool is_number(std::string str);
 int* random_sample(int size, int m, int *idx);
 int* double2int(double* val, int size);
+int* float2int(float* val, int size);
 double* mat_scale(double* mat, int rows, int cols, bool inplace, double start, double end, bool horizontal = false);
 double *vec_normalize(double *vec, int size, bool inplace);
 double* mat_normalize(double *mat, int rows, int cols, bool inplace, bool horizontal = true);
@@ -62,13 +65,7 @@ class m_timer {
 			tic_time = clock();
 			is_tic = true;
 		}
-		//void tic(char* msg) {
-			//if (msg != NULL) {
-				//std::cout << std::string(msg) << std::endl;
-			//}
-			//tic();
-		//}
-		void tic(std::string msg) {
+		void tic(const std::string& msg) {
 			if (msg != "")
 				std::cout << msg << std::endl;
 			tic();
@@ -85,13 +82,7 @@ class m_timer {
 			}
 			is_tic = false;
 		}
-		//void toc(char* msg) {
-			//if (msg != NULL) {
-				//std::cout << std::string(msg) << std::endl;
-			//}
-			//toc();
-		//}
-		void toc(std::string msg) {
+		void toc(const std::string& msg) {
 			if (msg != "")
 				std::cout << msg << std::endl;
 			toc();
