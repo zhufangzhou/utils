@@ -20,13 +20,17 @@ class m_random {
 			srand((unsigned int)time(NULL));
 		}
 
+		m_random(unsigned int seed) {
+			srand(seed);
+		}
+
 		~m_random() { }
 
 		static m_random getInstance() {
 			static m_random r;
 			return r;
 		}
-		
+
 		// return a random integer
 		int next_int() {
 			return rand();

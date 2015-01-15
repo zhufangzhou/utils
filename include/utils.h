@@ -72,19 +72,21 @@ class m_timer {
 		}
 
 		void toc() {
+			std::stringstream ss;
 			if (!is_tic) {
 				std::cerr << "please call `tic` first." << std::endl;
 			} else {
-				std::cout << "Time elapsed: "
+				ss << "Time elapsed: "
 					<< ((double)(clock() - tic_time)) / CLOCKS_PER_SEC
 					<< "s" 
 					<< std::endl;
+				std::cout << color_msg(ss.str(), "yellow") << std::endl;
 			}
 			is_tic = false;
 		}
 		void toc(const std::string& msg) {
 			if (msg != "")
-				std::cout << msg << std::endl;
+				std::cout << msg  << std::endl;
 			toc();
 		}
 };

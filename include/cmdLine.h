@@ -1,5 +1,4 @@
-#ifndef __CMDLINE_H
-#define __CMDLINE_H
+#pragma once 
 
 #include <iostream>
 #include <map>
@@ -11,7 +10,7 @@ private:
 	std::map<std::string, std::string> info;
 public:
 	cmdLineParser (int argc, char** argv) {
-		int i;
+		int i = 1;
 		char *opt, *opt_val;
 		while (i < argc) {
 			opt = argv[i];
@@ -24,30 +23,29 @@ public:
 				
 				// check whether this option has appeared
 				if (option.find(opt) != option.end()) {
-					throw "can not specified " + std::string(opt) + " twice";
+					std::cerr << "can not specified " << std::string(opt) << " twice" << std::endl;
+					exit(EXIT_FAILURE);
 				}
 
 				i++; // move on to option value
 
-				if (i+1 < argc) {
-					opt_val = argv[i+1];
+				if (i < argc) {
+					opt_val = argv[i];
 					if (strlen(opt_val) > 0 && opt_val[0] == '-') {
 						option[std::string(opt)] = std::string("1"); // if not specified value, give 1 for default means open this option
 						continue; // deal with this option name in next iteration
-					} else {
-						opt_val = new char[1];
-						opt_val[0] = '\0';
-					}
+					} 
 				} else {
 					opt_val = new char[1];
-					opt_val[0] = '\0';
+					opt_val[0] = '1';
 				}
 				// give value to corresponding option name
 				option[std::string(opt)] = std::string(opt_val);
 
 				i++; // move on to option name
 			} else {
-				throw "bad command line argument";
+				std::cerr << "bad command line argument" << std::endl;
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -57,10 +55,21 @@ public:
 		return opt_name;
 	}
 
+	bool hasOption(const std::string& opt_name) {
+		if (option.find(opt_name) != option.end()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	void checkOption() {
+		std::cout << option.size() << std::endl;
 		for (auto it = option.begin(); it != option.end(); it++) {
+			std::cout << it->first << std::endl;
 			if (info.find(it->first) == info.end()) {
-				throw "the option " + it->first + " do not register, please check again";
+				std::cerr << "the option `" << it->first << "` do not register, please check again" << std::endl;
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -71,7 +80,7 @@ public:
 		}
 	}
 
-	std::string getOptionValue(std::string opt_name) {
+	std::string getOptionValue(const std::string& opt_name) {
 		if (option.find(opt_name) != option.end()) {
 			return option[opt_name];
 		} else {
@@ -82,4 +91,3 @@ public:
 };
 
 
-#endif
