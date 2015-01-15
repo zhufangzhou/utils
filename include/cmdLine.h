@@ -64,9 +64,7 @@ public:
 	}
 
 	void checkOption() {
-		std::cout << option.size() << std::endl;
 		for (auto it = option.begin(); it != option.end(); it++) {
-			std::cout << it->first << std::endl;
 			if (info.find(it->first) == info.end()) {
 				std::cerr << "the option `" << it->first << "` do not register, please check again" << std::endl;
 				exit(EXIT_FAILURE);
